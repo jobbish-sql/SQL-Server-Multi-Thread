@@ -454,6 +454,14 @@ BEGIN
 END;
 
 
+-- not able to test on other engines
+IF SERVERPROPERTY('EngineEdition') NOT IN (2, 3)
+BEGIN
+	SET @error_message_OUT = N'Only supported for on-premises versions of SQL Server.'; 
+	RETURN;
+END;
+
+
 -- VIEW_SERVER_STATE permission is required
 IF HAS_PERMS_BY_NAME(NULL, NULL, N'VIEW SERVER STATE') = 0
 BEGIN
