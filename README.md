@@ -1,6 +1,6 @@
 Splitting up work to run between multiple SQL Server Agent jobs isn't the easiest thing to do. This framework aims to simmplify the process by abstracting away the Agent job parts. Currently only supported on on-premises SQL Server 2016 SP2+ and 2017+.
 
-## core:
+## core
 
 You need the core folder if you want to use the framework at all. This folder contains the stored procedures needed for the framework and the workloads in the other folders will not run without it. Key features:
 
@@ -10,7 +10,7 @@ You need the core folder if you want to use the framework at all. This folder co
 * The child procedures reschedule themselves in an attempt to spread out work over schedulers evenly
 * Validation and error reporting
 
-## cci_maintenance:
+## cci_maintenance
 
 You want cci_maintenance folder if you need a clustered columnstore maintenance solution designed to work over very databases that provides you as much flexibility and control as possible. You define the priority order for maintenance actions as well as whether or not a partition should go through REORGANIZE or REBUILD. Key features:
 
@@ -24,6 +24,6 @@ You want cci_maintenance folder if you need a clustered columnstore maintenance 
 
 Note: REORGANIZE and REBUILD do not preserve segment level ordering within a partition. Tables can be excluded from maintenance actions at the schema, table, or table name pattern matching levels. For a maintenance solution that can perserve segment ordering check out [CISL](https://github.com/NikoNeugebauer/CISL).
 
-## demo:
+## demo
 
 You want the demo folder if you are developing your own code using the framework and think that looking at a simple example would be helpful. This workload runs make-work stored procedures that calculate checksums.
