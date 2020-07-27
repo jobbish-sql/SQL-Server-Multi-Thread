@@ -1,8 +1,8 @@
-Splitting up work to run between multiple SQL Server Agent jobs isn't the easiest thing to do. This framework aims to simmplify the process by abstracting away the Agent job parts. Currently only supported on on-premises SQL Server 2016 SP2+ and 2017+.
+Splitting up work to run between multiple SQL Server Agent jobs isn't the easiest thing to do. This framework aims to simmplify the process by abstracting away the Agent job parts. Currently only supported for on-premises SQL Server 2016 SP2+ and 2017+.
 
 ## core
 
-You need the core folder if you want to use the framework at all. This folder contains the stored procedures needed for the framework and the workloads in the other folders will not run without it. Key features:
+You need the core folder to use any of the code in this repository. This folder contains the stored procedures needed for the Agent job multi-threading framework. Key features:
 
 * All Agent job work is abstracted away with a parent, child, and cleanup stored procedure model
 * Can specify the maximum number of child stored procedures that can run at the same time
