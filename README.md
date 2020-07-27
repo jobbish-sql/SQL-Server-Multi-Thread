@@ -12,7 +12,7 @@ You need the core folder if you want to use the framework at all. This folder co
 
 ## cci_maintenance
 
-You want cci_maintenance folder if you need a clustered columnstore maintenance solution designed to work over very databases that provides you as much flexibility and control as possible. You define the priority order for maintenance actions as well as whether or not a partition should go through REORGANIZE or REBUILD. Key features:
+You want the cci_maintenance folder if you need a clustered columnstore maintenance solution designed to work over very large databases that gives you full control over what maintenance actions happen. You define the priority order for maintenance actions as well as whether or not a partition should go through REORGANIZE or REBUILD. Key features:
 
 * Can create multiple threads to do work concurrently
 * Stops all work at time limit
