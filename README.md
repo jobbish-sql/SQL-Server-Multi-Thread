@@ -24,6 +24,20 @@ You want the cci_maintenance folder if you need a clustered columnstore maintena
 
 Note: REORGANIZE and REBUILD do not preserve segment level ordering within a partition. Tables can be excluded from maintenance actions at the schema, table, or table name pattern matching levels. For a maintenance solution that can perserve segment ordering check out [CISL](https://github.com/NikoNeugebauer/CISL).
 
+Install order:
+
+1. Run script in core/sp_AgentJobMultiThread.sql
+2. Create tables in cci_maintenance/CCI_Reorg_Rebuild_Tables.sql
+3. Run script in cci_maintenance/CCI_Reorg_Rebuild_Code.sql
+
+Example stored procedure call using all default parameter values:
+
+    EXEC [dbo].[sp_CCIReorgAndRebuild]
+    @CCI_included_database_name_list= N'🔥', -- database list with your CCIs
+    @max_CCI_alter_job_count = 2, -- number of concurrent jobs that can run
+    @max_minutes_to_run = 60; -- timeout for all jobs
+
+
 ## demo
 
 You want the demo folder if you are developing your own code using the framework and think that looking at a simple example would be helpful. This workload runs make-work stored procedures that calculate checksums.
