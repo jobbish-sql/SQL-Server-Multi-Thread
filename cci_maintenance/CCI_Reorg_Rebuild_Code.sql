@@ -6,7 +6,12 @@ SET CONCAT_NULL_YIELDS_NULL ON;
 SET QUOTED_IDENTIFIER ON;
 GO
 
-CREATE OR ALTER PROCEDURE [dbo].[sp_CCIReorgAndRebuild] (
+-- previous version used sp_ prefix. that was a mistake
+DROP PROCEDURE IF EXISTS dbo.sp_CCIReorgAndRebuild;
+
+GO
+
+CREATE OR ALTER PROCEDURE [dbo].[CCIReorgAndRebuild] (
 	@CCI_included_database_name_list NVARCHAR(4000),
 	@CCI_excluded_schema_name_list NVARCHAR(4000) = NULL,
 	@CCI_excluded_table_name_list NVARCHAR(4000) = NULL,
@@ -33,7 +38,7 @@ CREATE OR ALTER PROCEDURE [dbo].[sp_CCIReorgAndRebuild] (
 AS
 BEGIN
 /*
-Procedure Name: sp_CCIReorgAndRebuild
+Procedure Name: CCIReorgAndRebuild
 Author: Joe Obbish
 Version: 1.0
 Updates: https://github.com/jobbish-sql/SQL-Server-Multi-Thread
@@ -91,7 +96,7 @@ Parameter help:
 	The name of the database that contains all of the tables used by this CCI maintenance solution.
 	This does not need to match the database that contains all of the stored procedures.
 	Required procedures:
-		[sp_CCIReorgAndRebuild]
+		[CCIReorgAndRebuild]
 		[CCI_Reorg_Rebuild_Child_Job]
 		[CCI_Reorg_Rebuild_Cleanup_Jobs]
 
@@ -447,19 +452,13 @@ SET @used_SQL_expression_for_rebuild_calculation = CASE @rebuild_algorithm_name
 END;
 
 
-
-
-/*
-TODO: test on 2017 clean (not RTM)
-*/
-
 -- use stored procedure name and database for tables if optional logging parameters aren't set
 SET @logging_database_name = ISNULL(@logging_database_name, DB_NAME());
 SET @logging_schema_name = ISNULL(@logging_schema_name, OBJECT_SCHEMA_NAME(@@PROCID));
 
 
 SET @is_valid_initial = 1;
-EXEC [dbo].sp_AgentJobMultiThread_InitialValidation
+EXEC [dbo].AgentJobMultiThread_InitialValidation
 	@workload_identifier = @workload_identifier,
 	@logging_database_name = @logging_database_name,
 	@logging_schema_name = @logging_schema_name,
@@ -478,10 +477,8 @@ BEGIN
 END;
 
 
-
-
 -- fail if on older version than 2017 RTM or 2016 SP2
--- this is currently redundant but might matter if sp_AgentJobMultiThread_InitialValidation is updated to work with SQL Server 2014
+-- this is currently redundant but might matter if AgentJobMultiThread_InitialValidation is updated to work with SQL Server 2014
 SET @product_version = TRY_CAST(PARSENAME(CONVERT(NVARCHAR(20),SERVERPROPERTY('ProductVersion')), 4) AS INT);
 
 IF @product_version < 13 OR (@product_version = 13 AND TRY_CAST(PARSENAME(CONVERT(NVARCHAR(20),SERVERPROPERTY('ProductVersion')), 2) AS INT) < 5026)
@@ -536,7 +533,7 @@ END;
 SET @dynamic_sql_max = CAST(N'' AS NVARCHAR(MAX)) + N'SELECT @dynamic_sql_result_set_exists_OUT = 1
 FROM ' + QUOTENAME(@code_database_name) + N'.sys.objects o
 INNER JOIN ' + QUOTENAME(@code_database_name) + N'.sys.schemas s ON o.[schema_id] = s.[schema_id]
-where o.name IN (N''CCI_Reorg_Rebuild_Child_Job'', N''CCI_Reorg_Rebuild_Cleanup_Jobs'',N''sp_AgentJobMultiThread_InitialValidation'')
+where o.name IN (N''CCI_Reorg_Rebuild_Child_Job'', N''CCI_Reorg_Rebuild_Cleanup_Jobs'',N''AgentJobMultiThread_InitialValidation'')
 AND s.name = @code_schema_name
 AND o.type = ''P''
 HAVING COUNT_BIG(*) = 3';
@@ -584,7 +581,7 @@ N'@dynamic_sql_result_set_exists_OUT BIT OUTPUT',
 
 IF @dynamic_sql_result_set_exists = 1
 BEGIN
-	SET @nice_error_message = N'Cannot run sp_CCIReorgAndRebuild if previous run has not completed. Wait for the cleanup procedure to complete.'
+	SET @nice_error_message = N'Cannot run CCIReorgAndRebuild if previous run has not completed. Wait for the cleanup procedure to complete.'
 	 + N' To clean up after a failed run, examine the CCI_Reorg_Rebuild_Summary table and consider running a query similar to: 
 	 " WITH CTE AS (SELECT TOP (1) * FROM ' + QUOTENAME(@logging_database_name) + N'.' + QUOTENAME(@logging_schema_name) + N'.CCI_Reorg_Rebuild_Summary ORDER BY Summary_Start_Time_UTC DESC) DELETE FROM CTE; "';
 
@@ -1484,7 +1481,7 @@ GROUP BY Database_Name, Database_Id, Object_Id';
 EXEC sp_executesql @dynamic_sql_max;
 
 
-EXEC [dbo].sp_AgentJobMultiThread_CreateAgentJobs
+EXEC [dbo].AgentJobMultiThread_CreateAgentJobs
 	@workload_identifier = @workload_identifier,
 	@logging_database_name = @logging_database_name,
 	@logging_schema_name = @logging_schema_name,
@@ -1598,14 +1595,14 @@ EXEC sp_executesql @dynamic_sql_max,
 -- there was likely a problem with the parent procedure if this is NULL
 IF @reorg_use_COMPRESS_ALL_ROWGROUPS_option IS NULL
 BEGIN
-	THROW 60000, 'Cannot find expected row in CCI_Reorg_Rebuild_Summary table. Look for an error logged by the sp_CCIReorgAndRebuild stored procedure.', 1; 
+	THROW 60000, 'Cannot find expected row in CCI_Reorg_Rebuild_Summary table. Look for an error logged by the CCIReorgAndRebuild stored procedure.', 1; 
 	RETURN;
 END;
 
 
 IF @disable_CPU_rescheduling = 0
 BEGIN
-	EXEC dbo.sp_AgentJobMultiThread_RescheduleChildJobIfNeeded 
+	EXEC dbo.AgentJobMultiThread_RescheduleChildJobIfNeeded 
 		@workload_identifier = @workload_identifier,
 		@logging_database_name = @logging_database_name,
 		@logging_schema_name = @logging_schema_name,
@@ -1868,7 +1865,7 @@ BEGIN
 		COMMIT TRANSACTION;
 
 
-		EXEC [dbo].sp_AgentJobMultiThread_ShouldChildJobHalt 
+		EXEC [dbo].AgentJobMultiThread_ShouldChildJobHalt 
 			@workload_identifier = @workload_identifier,
 			@logging_database_name = @logging_database_name,
 			@logging_schema_name = @logging_schema_name,
@@ -2132,7 +2129,7 @@ BEGIN
 		EXEC sp_releaseapplock @Resource = N'UPDATE_CCI_REORG_REBUILD_TABLES';		
 		COMMIT TRANSACTION;
 
-		EXEC [dbo].sp_AgentJobMultiThread_ShouldChildJobHalt 
+		EXEC [dbo].AgentJobMultiThread_ShouldChildJobHalt 
 			@workload_identifier = @workload_identifier,
 			@logging_database_name = @logging_database_name,
 			@logging_schema_name = @logging_schema_name,
@@ -2213,12 +2210,12 @@ N'@end_stored_procedure_name_to_run_OUT SYSNAME OUTPUT, @used_job_prefix_OUT NVA
 -- there was likely a problem with the parent procedure if this is NULL
 IF @used_job_prefix IS NULL
 BEGIN
-	THROW 70010, 'Cannot find expected row in CCI_Reorg_Rebuild_Summary table. Look for an error logged by the sp_CCIReorgAndRebuild stored procedure.', 1; 
+	THROW 70010, 'Cannot find expected row in CCI_Reorg_Rebuild_Summary table. Look for an error logged by the CCIReorgAndRebuild stored procedure.', 1; 
 	RETURN;
 END;
    	  
 
-EXEC [dbo].sp_AgentJobMultiThread_ShouldCleanupStopChildJobs
+EXEC [dbo].AgentJobMultiThread_ShouldCleanupStopChildJobs
 	@workload_identifier = @workload_identifier,
 	@parent_start_time = @parent_start_time,
 	@job_prefix = @used_job_prefix,
@@ -2228,7 +2225,7 @@ EXEC [dbo].sp_AgentJobMultiThread_ShouldCleanupStopChildJobs
 
 IF @stop_jobs = 0
 BEGIN
-	EXEC [dbo].sp_AgentJobMultiThread_FinalizeCleanup
+	EXEC [dbo].AgentJobMultiThread_FinalizeCleanup
 		@workload_identifier = @workload_identifier,
 		@job_prefix = @used_job_prefix,
 		@retry_cleanup = 1;
@@ -2247,7 +2244,7 @@ INNER JOIN sys.dm_exec_sessions s ON r.session_id = s.session_id
 WHERE s.is_user_process = 1
 OPTION (MAXDOP 1);
 
-EXEC [dbo].sp_AgentJobMultiThread_CleanupChildJobs
+EXEC [dbo].AgentJobMultiThread_CleanupChildJobs
 	@workload_identifier = @workload_identifier,
 	@logging_database_name = @logging_database_name,
 	@logging_schema_name = @logging_schema_name,
@@ -2363,7 +2360,7 @@ EXEC sp_releaseapplock @Resource = N'UPDATE_CCI_REORG_REBUILD_TABLES';
 COMMIT TRANSACTION;
 
 
-EXEC [dbo].sp_AgentJobMultiThread_FinalizeCleanup
+EXEC [dbo].AgentJobMultiThread_FinalizeCleanup
 	@workload_identifier = @workload_identifier,
 	@job_prefix = @used_job_prefix,
 	@retry_cleanup = 0;
