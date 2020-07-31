@@ -32,7 +32,7 @@ Install order:
 
 Example stored procedure call using all default parameter values:
 
-    EXEC [dbo].[sp_CCIReorgAndRebuild]
+    EXEC [dbo].[CCIReorgAndRebuild]
     @CCI_included_database_name_list= N'🔥', -- database list with your CCIs
     @max_CCI_alter_job_count = 2, -- number of concurrent jobs that can run
     @max_minutes_to_run = 60; -- timeout for all jobs
