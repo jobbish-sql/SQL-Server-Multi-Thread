@@ -6,7 +6,21 @@ SET CONCAT_NULL_YIELDS_NULL ON;
 SET QUOTED_IDENTIFIER ON;
 GO
 
-CREATE OR ALTER PROCEDURE [dbo].sp_AgentJobMultiThread_Help
+-- previous version used sp_ prefix. that was a mistake
+DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_Help;
+DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_Internal_ValidateCommonParameters;
+DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_Internal_CheckProcedureExists;
+DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_InitialValidation;
+DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_CreateAgentJobs;
+DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_RescheduleChildJobIfNeeded;
+DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_ShouldChildJobHalt;
+DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_ShouldCleanupStopChildJobs;
+DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_CleanupChildJobs;
+DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_FinalizeCleanup;
+
+GO
+
+CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_Help
 AS
 BEGIN
 /*
@@ -107,7 +121,7 @@ GO
 
 
 
-CREATE OR ALTER PROCEDURE [dbo].sp_AgentJobMultiThread_Internal_ValidateCommonParameters (
+CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_Internal_ValidateCommonParameters (
 	@workload_identifier NVARCHAR(50),
 	@logging_database_name SYSNAME,
 	@logging_schema_name SYSNAME,
@@ -250,7 +264,7 @@ GO
 
 
 
-CREATE OR ALTER PROCEDURE [dbo].sp_AgentJobMultiThread_Internal_CheckProcedureExists (
+CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_Internal_CheckProcedureExists (
 	@procedure_name SYSNAME,
 	@procedure_exists_OUT BIT OUTPUT
 )
@@ -316,7 +330,7 @@ GO
 
 
 
-CREATE OR ALTER PROCEDURE [dbo].sp_AgentJobMultiThread_InitialValidation (
+CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_InitialValidation (
 	@workload_identifier NVARCHAR(50),
 	@logging_database_name SYSNAME = NULL,
 	@logging_schema_name SYSNAME = NULL,
@@ -530,7 +544,7 @@ END;
 
 
 -- check common parameters
-EXEC [dbo].sp_AgentJobMultiThread_Internal_ValidateCommonParameters
+EXEC [dbo].AgentJobMultiThread_Internal_ValidateCommonParameters
 	@workload_identifier = @workload_identifier,
 	@logging_database_name = @logging_database_name,
 	@logging_schema_name = @logging_schema_name,
@@ -572,7 +586,7 @@ END;
 
 
 -- validate @child_stored_procedure_name
-EXEC [dbo].sp_AgentJobMultiThread_Internal_CheckProcedureExists
+EXEC [dbo].AgentJobMultiThread_Internal_CheckProcedureExists
 	@procedure_name = @child_stored_procedure_name,
 	@procedure_exists_OUT = @procedure_exists OUTPUT;
 	
@@ -584,7 +598,7 @@ END;
 
 
 -- validate @cleanup_stored_procedure_name
-EXEC [dbo].sp_AgentJobMultiThread_Internal_CheckProcedureExists
+EXEC [dbo].AgentJobMultiThread_Internal_CheckProcedureExists
 	@procedure_name = @cleanup_stored_procedure_name,
 	@procedure_exists_OUT = @procedure_exists OUTPUT;
 	
@@ -623,7 +637,7 @@ GO
 
 
 
-CREATE OR ALTER PROCEDURE [dbo].sp_AgentJobMultiThread_CreateAgentJobs (
+CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_CreateAgentJobs (
 	@workload_identifier NVARCHAR(50),
 	@logging_database_name SYSNAME = NULL,
 	@logging_schema_name SYSNAME = NULL,
@@ -760,7 +774,7 @@ SET @logging_database_name = ISNULL(@logging_database_name, DB_NAME());
 SET @logging_schema_name = ISNULL(@logging_schema_name, OBJECT_SCHEMA_NAME(@@PROCID));
 
 -- check common parameters
-EXEC [dbo].sp_AgentJobMultiThread_Internal_ValidateCommonParameters
+EXEC [dbo].AgentJobMultiThread_Internal_ValidateCommonParameters
 	@workload_identifier = @workload_identifier,
 	@logging_database_name = @logging_database_name,
 	@logging_schema_name = @logging_schema_name,
@@ -777,7 +791,7 @@ END;
 
 -- validate @child_stored_procedure_name
 SET @procedure_exists = 0;
-EXEC [dbo].sp_AgentJobMultiThread_Internal_CheckProcedureExists
+EXEC [dbo].AgentJobMultiThread_Internal_CheckProcedureExists
 	@procedure_name = @child_stored_procedure_name,
 	@procedure_exists_OUT = @procedure_exists OUTPUT;
 	
@@ -790,7 +804,7 @@ END;
 
 -- validate @cleanup_stored_procedure_name
 SET @procedure_exists = 0;
-EXEC [dbo].sp_AgentJobMultiThread_Internal_CheckProcedureExists
+EXEC [dbo].AgentJobMultiThread_Internal_CheckProcedureExists
 	@procedure_name = @cleanup_stored_procedure_name,
 	@procedure_exists_OUT = @procedure_exists OUTPUT;
 	
@@ -997,7 +1011,7 @@ GO
 
 
 
-CREATE OR ALTER PROCEDURE [dbo].sp_AgentJobMultiThread_RescheduleChildJobIfNeeded (
+CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_RescheduleChildJobIfNeeded (
 	@workload_identifier NVARCHAR(50),
 	@logging_database_name SYSNAME = NULL,
 	@logging_schema_name SYSNAME = NULL,
@@ -1136,7 +1150,7 @@ SET @logging_database_name = ISNULL(@logging_database_name, DB_NAME());
 SET @logging_schema_name = ISNULL(@logging_schema_name, OBJECT_SCHEMA_NAME(@@PROCID));
 
 -- check common parameters
-EXEC [dbo].sp_AgentJobMultiThread_Internal_ValidateCommonParameters
+EXEC [dbo].AgentJobMultiThread_Internal_ValidateCommonParameters
 	@workload_identifier = @workload_identifier,
 	@logging_database_name = @logging_database_name,
 	@logging_schema_name = @logging_schema_name,
@@ -1153,7 +1167,7 @@ END;
 
 -- validate @child_stored_procedure_name
 SET @procedure_exists = 0;
-EXEC [dbo].sp_AgentJobMultiThread_Internal_CheckProcedureExists
+EXEC [dbo].AgentJobMultiThread_Internal_CheckProcedureExists
 	@procedure_name = @child_stored_procedure_name,
 	@procedure_exists_OUT = @procedure_exists OUTPUT;
 	
@@ -1264,7 +1278,7 @@ GO
 
 
 
-CREATE OR ALTER PROCEDURE [dbo].sp_AgentJobMultiThread_ShouldChildJobHalt (
+CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_ShouldChildJobHalt (
 	@workload_identifier NVARCHAR(50),
 	@logging_database_name SYSNAME = NULL,
 	@logging_schema_name SYSNAME = NULL,
@@ -1315,7 +1329,8 @@ Parameter help:
 
 */
 
-DECLARE @dynamic_sql_max NVARCHAR(MAX);
+DECLARE @dynamic_sql_max NVARCHAR(MAX),
+@stop_request_table_name SYSNAME;
 
 SET NOCOUNT ON;
 
@@ -1330,12 +1345,14 @@ END;
 SET @logging_database_name = ISNULL(@logging_database_name, DB_NAME());
 SET @logging_schema_name = ISNULL(@logging_schema_name, OBJECT_SCHEMA_NAME(@@PROCID));
 
+SET @stop_request_table_name = @workload_identifier + N'_Last_Stop_Request';
+
 
 SET @should_job_halt_OUT = 0;
 
 SET @dynamic_sql_max = CAST(N'' AS NVARCHAR(MAX)) + N'SELECT TOP (1) @dynamic_sql_result_set_exists_OUT = 1
 FROM ' + QUOTENAME(@logging_database_name) + N'.' + QUOTENAME(@logging_schema_name)
-+ N'.CCI_Reorg_Rebuild_Last_Stop_Request WITH (TABLOCKX)
++ N'.' + QUOTENAME(@stop_request_table_name) + N' WITH (TABLOCKX)
 WHERE @parent_start_time <= Stop_Request_UTC';
 
 EXEC sp_executesql @dynamic_sql_max,
@@ -1354,7 +1371,7 @@ GO
 
 
 
-CREATE OR ALTER PROCEDURE [dbo].sp_AgentJobMultiThread_ShouldCleanupStopChildJobs (
+CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_ShouldCleanupStopChildJobs (
 	@workload_identifier NVARCHAR(50),
 	@parent_start_time DATETIME2,
 	@job_prefix NVARCHAR(20) = NULL,
@@ -1465,7 +1482,7 @@ GO
 
 
 
-CREATE OR ALTER PROCEDURE [dbo].sp_AgentJobMultiThread_CleanupChildJobs (
+CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_CleanupChildJobs (
 	@workload_identifier NVARCHAR(50),
 	@logging_database_name SYSNAME = NULL,
 	@logging_schema_name SYSNAME = NULL,
@@ -1546,7 +1563,7 @@ SET @logging_schema_name = ISNULL(@logging_schema_name, OBJECT_SCHEMA_NAME(@@PRO
 
 -- validate parameters
 -- check common parameters
-EXEC [dbo].sp_AgentJobMultiThread_Internal_ValidateCommonParameters
+EXEC [dbo].AgentJobMultiThread_Internal_ValidateCommonParameters
 	@workload_identifier = @workload_identifier,
 	@logging_database_name = @logging_database_name,
 	@logging_schema_name = @logging_schema_name,
@@ -1643,7 +1660,7 @@ GO
 
 
 
-CREATE OR ALTER PROCEDURE [dbo].sp_AgentJobMultiThread_FinalizeCleanup (
+CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_FinalizeCleanup (
 	@workload_identifier NVARCHAR(50),
 	@job_prefix NVARCHAR(20) = NULL,
 	@retry_cleanup BIT
