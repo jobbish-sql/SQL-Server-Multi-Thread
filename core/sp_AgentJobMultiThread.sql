@@ -24,14 +24,14 @@ CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_Help
 AS
 BEGIN
 /*
-Procedure Name: sp_AgentJobMultiThread_Help
+Procedure Name: AgentJobMultiThread_Help
 Author: Joe Obbish
 Version: 1.0
 Updates: https://github.com/jobbish-sql/SQL-Server-Multi-Thread
 License: MIT
 Purpose: 
 
-	Call this procedure to get T-SQL result sets that explain how to use the sp_AgentJobMultiThread framework.
+	Call this procedure to get T-SQL result sets that explain how to use the AgentJobMultiThread framework.
 */
 
 SELECT v.txt AS [Main Features]
@@ -60,21 +60,21 @@ VALUES
 SELECT v.txt AS [Creating a workload parent procedure]
 FROM (
 VALUES
-	(N'A parent procedure serves as the application entry point for the sp_AgentJobMultiThread framework.'),
+	(N'A parent procedure serves as the application entry point for the AgentJobMultiThread framework.'),
 	(N'Reference the ThreadingDemoParent procedure in the demo folder for a simple example.'),
 	(N'There are no required parameters.'),
 	(N'Example code flow:'),
-	(N'	STEP 1: Run standard validation by calling sp_AgentJobMultiThread_InitialValidation and quit if there are reported issues'),
+	(N'	STEP 1: Run standard validation by calling AgentJobMultiThread_InitialValidation and quit if there are reported issues'),
 	(N'	STEP 2: Run additional validation specific to to your workload and quit if there are reported issues'),
 	(N'	STEP 3: Do setup work specific to your workload including creating and populated needed tables'),
-	(N'	STEP 4: Create the agent jobs by calling sp_AgentJobMultiThread_CreateAgentJobs')
+	(N'	STEP 4: Create the agent jobs by calling AgentJobMultiThread_CreateAgentJobs')
 ) v (txt);
 
 
 SELECT v.txt AS [Creating a workload child procedure]
 FROM (
 VALUES
-	(N'A child procedure serves as the application multithreading area for the sp_AgentJobMultiThread framework.'),
+	(N'A child procedure serves as the application multithreading area for the AgentJobMultiThread framework.'),
 	(N'Reference the ThreadingDemoChild procedure in the demo folder for a simple example.'),
 	(N'Parameters must exactly match the following:'),
 	(N'	@logging_database_name SYSNAME,'),
@@ -84,17 +84,17 @@ VALUES
 	(N'	@job_attempt_number SMALLINT'),
 	(N'Example code flow:'),
 	(N'	STEP 1: Do any prep work such as getting additional parameters from a summary table'),
-	(N'	STEP 2: Call sp_AgentJobMultiThread_RescheduleChildJobIfNeeded and quit if the child procedure will be rescheduled'),
+	(N'	STEP 2: Call AgentJobMultiThread_RescheduleChildJobIfNeeded and quit if the child procedure will be rescheduled'),
 	(N'	STEP 3: In a loop, find the next unit of work'),
 	(N'	STEP 4: In a loop, complete the unit of work'),
-	(N'	STEP 5: In a loop, call sp_AgentJobMultiThread_ShouldChildJobHalt and quit if needed')
+	(N'	STEP 5: In a loop, call AgentJobMultiThread_ShouldChildJobHalt and quit if needed')
 ) v (txt);
 
 
 SELECT v.txt AS [Creating a workload cleanup procedure]
 FROM (
 VALUES
-	(N'A cleanup procedure serves as the application end point for the sp_AgentJobMultiThread framework.'),
+	(N'A cleanup procedure serves as the application end point for the AgentJobMultiThread framework.'),
 	(N'Reference the ThreadingDemoCleanup procedure in the demo folder for a simple example.'),
 	(N'Parameters must exactly match the following:'),
 	(N'	@logging_database_name SYSNAME,'),
@@ -103,11 +103,11 @@ VALUES
 	(N'	@max_minutes_to_run SMALLINT'),
 	(N'Example code flow:'),
 	(N'	STEP 1: Do any prep work such as getting additional parameters from a summary table'),
-	(N'	STEP 2: Call sp_AgentJobMultiThread_ShouldCleanupStopChildJobs to determine if cleanup should occur'),
-	(N'	STEP 3: If cleanup should not occur yet then call sp_AgentJobMultiThread_FinalizeCleanup and quit'),
-	(N'	STEP 4: If cleanup should occur then call sp_AgentJobMultiThread_CleanupChildJobs'),
+	(N'	STEP 2: Call AgentJobMultiThread_ShouldCleanupStopChildJobs to determine if cleanup should occur'),
+	(N'	STEP 3: If cleanup should not occur yet then call AgentJobMultiThread_FinalizeCleanup and quit'),
+	(N'	STEP 4: If cleanup should occur then call AgentJobMultiThread_CleanupChildJobs'),
 	(N'	STEP 5: Complete any other necessary work in the procedure such as updating summary tables'),
-	(N'	STEP 6: Call sp_AgentJobMultiThread_FinalizeCleanup to clean up agent jobs and schedules')
+	(N'	STEP 6: Call AgentJobMultiThread_FinalizeCleanup to clean up agent jobs and schedules')
 ) v (txt);
 
 RETURN;
@@ -132,7 +132,7 @@ CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_Internal_ValidateCommonParam
 AS
 BEGIN
 /*
-Procedure Name: sp_AgentJobMultiThread_Internal_ValidateCommonParameters
+Procedure Name: AgentJobMultiThread_Internal_ValidateCommonParameters
 Author: Joe Obbish
 Version: 1.0
 Updates: https://github.com/jobbish-sql/SQL-Server-Multi-Thread
@@ -154,15 +154,15 @@ Parameter help:
 @logging_database_name SYSNAME:
 
 	Use this parameter if you want tables to be created in a different database than the database that
-	contains the sp_AgentJobMultiThread stored procedures.
-	The default value is to use the database context of the sp_AgentJobMultiThread stored procedures.
+	contains the AgentJobMultiThread stored procedures.
+	The default value is to use the database context of the AgentJobMultiThread stored procedures.
 
 
 @logging_schema_name SYSNAME:
 
 	Use this parameter if you want tables to be created in a different schema than the schema that
-	contains the sp_AgentJobMultiThread stored procedures.
-	The default value is to use the schema context of the sp_AgentJobMultiThread stored procedures.
+	contains the AgentJobMultiThread stored procedures.
+	The default value is to use the schema context of the AgentJobMultiThread stored procedures.
 
 
 @parent_start_time DATETIME2:
@@ -271,7 +271,7 @@ CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_Internal_CheckProcedureExist
 AS
 BEGIN
 /*
-Procedure Name: sp_AgentJobMultiThread_Internal_CheckProcedureExists
+Procedure Name: AgentJobMultiThread_Internal_CheckProcedureExists
 Author: Joe Obbish
 Version: 1.0
 Updates: https://github.com/jobbish-sql/SQL-Server-Multi-Thread
@@ -287,7 +287,7 @@ Parameter help:
 @procedure_name SYSNAME:
 
 	The name of the stored procedure to check existence for.
-	This stored procedure must exist in the same database and schema as the sp_AgentJobMultiThread.
+	This stored procedure must exist in the same database and schema as the AgentJobMultiThread.
 
 	
 @procedure_exists_OUT BIT OUTPUT:
@@ -345,7 +345,7 @@ CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_InitialValidation (
 AS
 BEGIN
 /*
-Procedure Name: sp_AgentJobMultiThread_InitialValidation
+Procedure Name: AgentJobMultiThread_InitialValidation
 Author: Joe Obbish
 Version: 1.0
 Updates: https://github.com/jobbish-sql/SQL-Server-Multi-Thread
@@ -371,15 +371,15 @@ Parameter help:
 @logging_database_name SYSNAME:
 
 	Use this parameter if you want tables to be created in a different database than the database that
-	contains the sp_AgentJobMultiThread stored procedures.
-	The default value is to use the database context of the sp_AgentJobMultiThread stored procedures.
+	contains the AgentJobMultiThread stored procedures.
+	The default value is to use the database context of the AgentJobMultiThread stored procedures.
 
 
 @logging_schema_name SYSNAME:
 
 	Use this parameter if you want tables to be created in a different schema than the schema that
-	contains the sp_AgentJobMultiThread stored procedures.
-	The default value is to use the schema context of the sp_AgentJobMultiThread stored procedures.
+	contains the AgentJobMultiThread stored procedures.
+	The default value is to use the schema context of the AgentJobMultiThread stored procedures.
 
 
 @parent_start_time DATETIME2:
@@ -391,15 +391,15 @@ Parameter help:
 @child_stored_procedure_name SYSNAME:
 
 	The name of the stored procedure used to perform the "child" work for the workload.
-	This stored procedure must exist in the same database and schema as the sp_AgentJobMultiThread.
-	Reference sp_AgentJobMultiThread_Help if you need more information.
+	This stored procedure must exist in the same database and schema as the AgentJobMultiThread.
+	Reference AgentJobMultiThread_Help if you need more information.
 
 
 @cleanup_stored_procedure_name SYSNAME:
 
 	The name of the stored procedure used to perform the "cleanup" work for the workload.
-	This stored procedure must exist in the same database and schema as the sp_AgentJobMultiThread.
-	Reference sp_AgentJobMultiThread_Help if you need more information.
+	This stored procedure must exist in the same database and schema as the AgentJobMultiThread.
+	Reference AgentJobMultiThread_Help if you need more information.
 
 
 @max_minutes_to_run SMALLINT:
@@ -455,7 +455,7 @@ END;
 SET @product_version = TRY_CAST(PARSENAME(CONVERT(NVARCHAR(20),SERVERPROPERTY('ProductVersion')), 4) AS INT);
 IF @product_version < 13 OR (@product_version = 13 AND TRY_CAST(PARSENAME(CONVERT(NVARCHAR(20),SERVERPROPERTY('ProductVersion')), 2) AS INT) < 5026)
 BEGIN
-	SET @error_message_OUT = N'Not tested on versions older than SQL Server 2012. Comment out this check in sp_AgentJobMultiThread_InitialValidation at your own risk to run on older versions.'; 
+	SET @error_message_OUT = N'Not tested on versions older than SQL Server 2012. Comment out this check in AgentJobMultiThread_InitialValidation at your own risk to run on older versions.'; 
 	RETURN;
 END;
 
@@ -651,7 +651,7 @@ CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_CreateAgentJobs (
 AS
 BEGIN
 /*
-Procedure Name: sp_AgentJobMultiThread_CreateAgentJobs
+Procedure Name: AgentJobMultiThread_CreateAgentJobs
 Author: Joe Obbish
 Version: 1.0
 Updates: https://github.com/jobbish-sql/SQL-Server-Multi-Thread
@@ -674,7 +674,7 @@ Purpose:
 		@parent_start_time DATETIME2,
 		@max_minutes_to_run SMALLINT'
 
-	For more information about child and cleanup procedures execute the sp_AgentJobMultiThread_Help stored procedure.
+	For more information about child and cleanup procedures execute the AgentJobMultiThread_Help stored procedure.
 
 
 Parameter help:
@@ -688,15 +688,15 @@ Parameter help:
 @logging_database_name SYSNAME:
 
 	Use this parameter if you want tables to be created in a different database than the database that
-	contains the sp_AgentJobMultiThread stored procedures.
-	The default value is to use the database context of the sp_AgentJobMultiThread stored procedures.
+	contains the AgentJobMultiThread stored procedures.
+	The default value is to use the database context of the AgentJobMultiThread stored procedures.
 
 
 @logging_schema_name SYSNAME:
 
 	Use this parameter if you want tables to be created in a different schema than the schema that
-	contains the sp_AgentJobMultiThread stored procedures.
-	The default value is to use the schema context of the sp_AgentJobMultiThread stored procedures.
+	contains the AgentJobMultiThread stored procedures.
+	The default value is to use the schema context of the AgentJobMultiThread stored procedures.
 
 
 @parent_start_time DATETIME2:
@@ -708,15 +708,15 @@ Parameter help:
 @child_stored_procedure_name SYSNAME:
 
 	The name of the stored procedure used to perform the "child" work for the workload.
-	This stored procedure must exist in the same database and schema as the sp_AgentJobMultiThread.
-	Reference sp_AgentJobMultiThread_Help if you need more information.
+	This stored procedure must exist in the same database and schema as the AgentJobMultiThread.
+	Reference AgentJobMultiThread_Help if you need more information.
 
 
 @cleanup_stored_procedure_name SYSNAME:
 
 	The name of the stored procedure used to perform the "cleanup" work for the workload.
-	This stored procedure must exist in the same database and schema as the sp_AgentJobMultiThread.
-	Reference sp_AgentJobMultiThread_Help if you need more information. 
+	This stored procedure must exist in the same database and schema as the AgentJobMultiThread.
+	Reference AgentJobMultiThread_Help if you need more information. 
 
 
 @max_minutes_to_run SMALLINT:
@@ -764,7 +764,7 @@ SET NOCOUNT ON;
 -- check for outer transaction or for implicit transactions
 IF @@TRANCOUNT > 0
 BEGIN
-	THROW 100000, N'Cannot call sp_AgentJobMultiThread_CreateAgentJobs in an outer transaction because agent jobs may not start as expected.', 1
+	THROW 100000, N'Cannot call AgentJobMultiThread_CreateAgentJobs in an outer transaction because agent jobs may not start as expected.', 1
 	RETURN;
 END;
 
@@ -817,14 +817,14 @@ END;
 	
 IF @max_minutes_to_run IS NULL OR @max_minutes_to_run <= 0
 BEGIN
-	THROW 100030, N'The @max_minutes_to_run parameter of sp_AgentJobMultiThread_CreateAgentJobs must be a positive number.', 1
+	THROW 100030, N'The @max_minutes_to_run parameter of AgentJobMultiThread_CreateAgentJobs must be a positive number.', 1
 	RETURN;
 END;
 
 	
 IF @total_jobs_to_create IS NULL OR @total_jobs_to_create <= 0
 BEGIN
-	THROW 100050, N'The @total_jobs_to_create parameter of sp_AgentJobMultiThread_CreateAgentJobs must be a positive number.', 1
+	THROW 100050, N'The @total_jobs_to_create parameter of AgentJobMultiThread_CreateAgentJobs must be a positive number.', 1
 	RETURN;
 END;
 
@@ -926,7 +926,7 @@ SET @cleanup_job_command  = N'EXEC ' + QUOTENAME(@code_schema_name) + N'.' + QUO
 + N''',
 @max_minutes_to_run = ' + CAST(@max_minutes_to_run AS NVARCHAR(5));
 
-SET @job_description = N'Clean up job created for ' + @workload_identifier + N' workload by stored procedure sp_AgentJobMultiThread_CreateAgentJobs';
+SET @job_description = N'Clean up job created for ' + @workload_identifier + N' workload by stored procedure AgentJobMultiThread_CreateAgentJobs';
 
 IF EXISTS (SELECT 1 FROM msdb.dbo.sysjobs WHERE name = @cleanup_job_name)
 BEGIN	
@@ -982,7 +982,7 @@ BEGIN
 	+ N',
 	@job_attempt_number = 1';
 
-	SET @job_description = N'Child up job created for ' + @workload_identifier + N' workload by stored procedure sp_AgentJobMultiThread_CreateAgentJobs';
+	SET @job_description = N'Child up job created for ' + @workload_identifier + N' workload by stored procedure AgentJobMultiThread_CreateAgentJobs';
 
 	EXEC msdb.dbo.sp_add_job @job_name = @child_job_name,
 	@description = @job_description,
@@ -1026,7 +1026,7 @@ CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_RescheduleChildJobIfNeeded (
 AS
 BEGIN
 /*
-Procedure Name: sp_AgentJobMultiThread_RescheduleChildJobIfNeeded
+Procedure Name: AgentJobMultiThread_RescheduleChildJobIfNeeded
 Author: Joe Obbish
 Version: 1.0
 Updates: https://github.com/jobbish-sql/SQL-Server-Multi-Thread
@@ -1045,7 +1045,7 @@ Purpose:
 		@job_number SMALLINT,
 		@job_attempt_number SMALLINT
 
-	For more information about child procedures execute the sp_AgentJobMultiThread_Help stored procedure.
+	For more information about child procedures execute the AgentJobMultiThread_Help stored procedure.
 
 
 Parameter help:
@@ -1059,15 +1059,15 @@ Parameter help:
 @logging_database_name SYSNAME:
 
 	Use this parameter if you want tables to be created in a different database than the database that
-	contains the sp_AgentJobMultiThread stored procedures.
-	The default value is to use the database context of the sp_AgentJobMultiThread stored procedures.
+	contains the AgentJobMultiThread stored procedures.
+	The default value is to use the database context of the AgentJobMultiThread stored procedures.
 
 
 @logging_schema_name SYSNAME:
 
 	Use this parameter if you want tables to be created in a different schema than the schema that
-	contains the sp_AgentJobMultiThread stored procedures.
-	The default value is to use the schema context of the sp_AgentJobMultiThread stored procedures.
+	contains the AgentJobMultiThread stored procedures.
+	The default value is to use the schema context of the AgentJobMultiThread stored procedures.
 
 
 @parent_start_time DATETIME2:
@@ -1079,8 +1079,8 @@ Parameter help:
 @child_stored_procedure_name SYSNAME:
 
 	The name of the stored procedure used to perform the "child" work for the workload.
-	This stored procedure must exist in the same database and schema as the sp_AgentJobMultiThread.
-	Reference sp_AgentJobMultiThread_Help if you need more information.
+	This stored procedure must exist in the same database and schema as the AgentJobMultiThread.
+	Reference AgentJobMultiThread_Help if you need more information.
 
 
 @job_prefix NVARCHAR(20):
@@ -1140,7 +1140,7 @@ SET NOCOUNT ON;
 -- check for outer transaction or for implicit transactions
 IF @@TRANCOUNT > 0
 BEGIN
-	THROW 100060, N'Cannot call sp_AgentJobMultiThread_RescheduleChildJobIfNeeded in an outer transaction because agent jobs may not start as expected.', 1
+	THROW 100060, N'Cannot call AgentJobMultiThread_RescheduleChildJobIfNeeded in an outer transaction because agent jobs may not start as expected.', 1
 	RETURN;
 END;
 
@@ -1180,21 +1180,21 @@ END;
 
 IF @job_number IS NULL OR @job_number < 0
 BEGIN
-	THROW 100100, N'The @job_number parameter of sp_AgentJobMultiThread_RescheduleChildJobIfNeeded must be a non-negative number.', 1
+	THROW 100100, N'The @job_number parameter of AgentJobMultiThread_RescheduleChildJobIfNeeded must be a non-negative number.', 1
 	RETURN;
 END;
 
 
 IF @job_attempt_number IS NULL OR @job_attempt_number < 0
 BEGIN
-	THROW 100110, N'The @job_attempt_number parameter of sp_AgentJobMultiThread_RescheduleChildJobIfNeeded must be a non-negative number.', 1
+	THROW 100110, N'The @job_attempt_number parameter of AgentJobMultiThread_RescheduleChildJobIfNeeded must be a non-negative number.', 1
 	RETURN;
 END;
 
 
 IF @max_reschedule_attempts IS NULL OR @max_reschedule_attempts < 0
 BEGIN
-	THROW 100120, N'The @max_reschedule_attempts parameter of sp_AgentJobMultiThread_RescheduleChildJobIfNeeded must be a non-negative number.', 1
+	THROW 100120, N'The @max_reschedule_attempts parameter of AgentJobMultiThread_RescheduleChildJobIfNeeded must be a non-negative number.', 1
 	RETURN;
 END;
 
@@ -1246,7 +1246,7 @@ BEGIN
 	+ N',
 	@job_attempt_number = ' + CAST(@job_attempt_number + 1 AS NVARCHAR(5));
 
-	SET @job_description = N'Child up job created for ' + @workload_identifier + N' workload by stored procedure sp_AgentJobMultiThread_CreateAgentJobs';
+	SET @job_description = N'Child up job created for ' + @workload_identifier + N' workload by stored procedure AgentJobMultiThread_CreateAgentJobs';
 
 	EXEC msdb.dbo.sp_add_job @job_name = @child_job_name,
 	@description = @job_description,
@@ -1288,7 +1288,7 @@ CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_ShouldChildJobHalt (
 AS
 BEGIN
 /*
-Procedure Name: sp_AgentJobMultiThread_ShouldChildJobHalt
+Procedure Name: AgentJobMultiThread_ShouldChildJobHalt
 Author: Joe Obbish
 Version: 1.0
 Updates: https://github.com/jobbish-sql/SQL-Server-Multi-Thread
@@ -1311,15 +1311,15 @@ Parameter help:
 @logging_database_name SYSNAME:
 
 	Use this parameter if you want tables to be created in a different database than the database that
-	contains the sp_AgentJobMultiThread stored procedures.
-	The default value is to use the database context of the sp_AgentJobMultiThread stored procedures.
+	contains the AgentJobMultiThread stored procedures.
+	The default value is to use the database context of the AgentJobMultiThread stored procedures.
 
 
 @logging_schema_name SYSNAME:
 
 	Use this parameter if you want tables to be created in a different schema than the schema that
-	contains the sp_AgentJobMultiThread stored procedures.
-	The default value is to use the schema context of the sp_AgentJobMultiThread stored procedures.
+	contains the AgentJobMultiThread stored procedures.
+	The default value is to use the schema context of the AgentJobMultiThread stored procedures.
 
 
 @parent_start_time DATETIME2:
@@ -1337,7 +1337,7 @@ SET NOCOUNT ON;
 -- limited validation because this procedure may be called thousands of times
 IF @workload_identifier IS NULL OR @parent_start_time IS NULL
 BEGIN
-	THROW 100130, N'The @workload_identifier and @parent_start_time parameters of sp_AgentJobMultiThread_ShouldChildJobHalt do not allow NULL.', 1
+	THROW 100130, N'The @workload_identifier and @parent_start_time parameters of AgentJobMultiThread_ShouldChildJobHalt do not allow NULL.', 1
 	RETURN;
 END;
 
@@ -1381,7 +1381,7 @@ CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_ShouldCleanupStopChildJobs (
 AS
 BEGIN
 /*
-Procedure Name: sp_AgentJobMultiThread_ShouldCleanupStopChildJobs
+Procedure Name: AgentJobMultiThread_ShouldCleanupStopChildJobs
 Author: Joe Obbish
 Version: 1.0
 Updates: https://github.com/jobbish-sql/SQL-Server-Multi-Thread
@@ -1436,14 +1436,14 @@ SET @should_stop_jobs_OUT = 0;
 -- validate parameters
 IF @workload_identifier IS NULL OR @parent_start_time IS NULL OR @max_minutes_to_run IS NULL
 BEGIN
-	THROW 100140, N'Only the @job_prefix parameter of sp_AgentJobMultiThread_ShouldCleanupStopChildJobs allows NULL.', 1
+	THROW 100140, N'Only the @job_prefix parameter of AgentJobMultiThread_ShouldCleanupStopChildJobs allows NULL.', 1
 	RETURN;
 END;
 
 
 IF @max_minutes_to_run <= 0
 BEGIN
-	THROW 100150, N'The @max_minutes_to_run parameter of sp_AgentJobMultiThread_ShouldCleanupStopChildJobs must be a positive value.', 1
+	THROW 100150, N'The @max_minutes_to_run parameter of AgentJobMultiThread_ShouldCleanupStopChildJobs must be a positive value.', 1
 	RETURN;
 END;
 
@@ -1493,7 +1493,7 @@ CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_CleanupChildJobs (
 AS
 BEGIN
 /*
-Procedure Name: sp_AgentJobMultiThread_CleanupChildJobs
+Procedure Name: AgentJobMultiThread_CleanupChildJobs
 Author: Joe Obbish
 Version: 1.0
 Updates: https://github.com/jobbish-sql/SQL-Server-Multi-Thread
@@ -1515,15 +1515,15 @@ Parameter help:
 @logging_database_name SYSNAME:
 
 	Use this parameter if you want tables to be created in a different database than the database that
-	contains the sp_AgentJobMultiThread stored procedures.
-	The default value is to use the database context of the sp_AgentJobMultiThread stored procedures.
+	contains the AgentJobMultiThread stored procedures.
+	The default value is to use the database context of the AgentJobMultiThread stored procedures.
 
 
 @logging_schema_name SYSNAME:
 
 	Use this parameter if you want tables to be created in a different schema than the schema that
-	contains the sp_AgentJobMultiThread stored procedures.
-	The default value is to use the schema context of the sp_AgentJobMultiThread stored procedures.
+	contains the AgentJobMultiThread stored procedures.
+	The default value is to use the schema context of the AgentJobMultiThread stored procedures.
 
 
 @job_prefix NVARCHAR(20):
@@ -1668,7 +1668,7 @@ CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_FinalizeCleanup (
 AS
 BEGIN
 /*
-Procedure Name: sp_AgentJobMultiThread_FinalizeCleanup
+Procedure Name: AgentJobMultiThread_FinalizeCleanup
 Author: Joe Obbish
 Version: 1.0
 Updates: https://github.com/jobbish-sql/SQL-Server-Multi-Thread
@@ -1698,7 +1698,7 @@ Parameter help:
 	
 	Set this parameter to 1 if the cleanup procedure has done its work and there is no longer a need to run it.
 	Set this parameter to 0 if the cleanup procedure halted early based on the output parameter of
-	sp_AgentJobMultiThread_ShouldCleanupStopChildJobs and needs to try again in a minute.
+	AgentJobMultiThread_ShouldCleanupStopChildJobs and needs to try again in a minute.
 */
 
 DECLARE @next_start_time_local DATETIME,
@@ -1713,7 +1713,7 @@ SET NOCOUNT ON;
 -- validate parameters
 IF @workload_identifier IS NULL OR @retry_cleanup IS NULL
 BEGIN
-	THROW 100180, N'The @workload_identifier and @retry_cleanup parameters of sp_AgentJobMultiThread_FinalizeCleanup do not allow NULL.', 1
+	THROW 100180, N'The @workload_identifier and @retry_cleanup parameters of AgentJobMultiThread_FinalizeCleanup do not allow NULL.', 1
 	RETURN;
 END;
 
