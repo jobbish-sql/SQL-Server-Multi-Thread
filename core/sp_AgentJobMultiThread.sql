@@ -46,7 +46,7 @@ VALUES
 SELECT v.txt AS [Requirements]
 FROM (
 VALUES
-	(N'SQL Server 2017+ or SQL Server 2016 SP2+'),
+	(N'SQL Server 2019, SQL Server 2017, or SQL Server 2016 SP2+'),
 	(N'Standard, Developer, or Enterprise editions'),
 	(N'Ability to create and run T-SQL Agent Jobs'),
 	(N'VIEW_SERVER_STATE permission for the caller'),
