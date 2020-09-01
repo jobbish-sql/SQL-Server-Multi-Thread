@@ -59,7 +59,7 @@ Purpose:
 
 
 	Key Limitations: 
-		* Only runs on SQL Server 2016 SP2+ and 2017+.
+		* Only runs on SQL Server 2016 SP2+, 2017, and 2019.
 		* Requires the ability to creates T-SQL Agent Jobs.
 		* Only performs maintenance actions against clustered columnstore indexes.
 		* Does not respect segment level ordering within a partition which can be ruined by REORGANIZE and REBUILD. Such tables should be excluded.
