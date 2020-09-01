@@ -451,7 +451,7 @@ END;
 
 
 -- fail if on older version than 2016 SP2
--- it would likely be straightforward to make the agent framework work on SQL Server 2012 and 2014 but this has not bee tested
+-- it would likely be straightforward to make the agent framework work on SQL Server 2012 and 2014 but this has not been tested
 SET @product_version = TRY_CAST(PARSENAME(CONVERT(NVARCHAR(20),SERVERPROPERTY('ProductVersion')), 4) AS INT);
 IF @product_version < 13 OR (@product_version = 13 AND TRY_CAST(PARSENAME(CONVERT(NVARCHAR(20),SERVERPROPERTY('ProductVersion')), 2) AS INT) < 5026)
 BEGIN
