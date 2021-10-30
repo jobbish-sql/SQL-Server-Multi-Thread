@@ -1,4 +1,4 @@
-Splitting up work to run between multiple SQL Server Agent jobs isn't the easiest thing to do. This framework aims to simplify the process by abstracting away the Agent job parts. Currently only supported for on-premises SQL Server 2016 SP2+, 2017, and 2019.
+Splitting up work to run between multiple SQL Server Agent jobs isn't the easiest thing to do. This framework aims to simplify the process by abstracting away the Agent job parts. Currently only supported for Azure SQL Managed Instances and on-premises SQL Server 2016 SP2+, 2017, and 2019.
 
 ## core
 
