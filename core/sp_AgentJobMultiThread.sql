@@ -876,7 +876,7 @@ BEGIN
 
 	SET @dynamic_sql_max = CAST(N'' AS NVARCHAR(MAX)) + N'INSERT INTO ' + QUOTENAME(@logging_database_name) + N'.' + QUOTENAME(@logging_schema_name)
 	+ N'.' + QUOTENAME(@stop_request_table_name) + N' WITH (TABLOCKX) (Stop_Request_UTC)
-	VALUES(DATEADD(SECOND, -1, SYSUTCDATETIME()))';
+	VALUES(DATEADD(SECOND, -600, SYSUTCDATETIME()))';
 
 	EXEC sp_executesql @dynamic_sql_max;
 END;
