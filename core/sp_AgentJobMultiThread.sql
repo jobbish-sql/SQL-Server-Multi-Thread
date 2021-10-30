@@ -6,20 +6,6 @@ SET CONCAT_NULL_YIELDS_NULL ON;
 SET QUOTED_IDENTIFIER ON;
 GO
 
--- previous version used sp_ prefix. that was a mistake
-DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_Help;
-DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_Internal_ValidateCommonParameters;
-DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_Internal_CheckProcedureExists;
-DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_InitialValidation;
-DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_CreateAgentJobs;
-DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_RescheduleChildJobIfNeeded;
-DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_ShouldChildJobHalt;
-DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_ShouldCleanupStopChildJobs;
-DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_CleanupChildJobs;
-DROP PROCEDURE IF EXISTS dbo.sp_AgentJobMultiThread_FinalizeCleanup;
-
-GO
-
 CREATE OR ALTER PROCEDURE [dbo].AgentJobMultiThread_Help
 AS
 BEGIN
@@ -450,29 +436,29 @@ BEGIN
 END;
 
 
+-- not able to test on other engines
+IF SERVERPROPERTY('EngineEdition') NOT IN (2, 3, 8)
+BEGIN
+    SET @error_message_OUT = N'Only supported for Managed Instances and on-premises versions of SQL Server.';
+    RETURN;
+END;
+
+
 -- fail if on older version than 2016 SP2
 -- it would likely be straightforward to make the agent framework work on SQL Server 2012 and 2014 but this has not been tested
 SET @product_version = TRY_CAST(PARSENAME(CONVERT(NVARCHAR(20),SERVERPROPERTY('ProductVersion')), 4) AS INT);
-IF @product_version < 13 OR (@product_version = 13 AND TRY_CAST(PARSENAME(CONVERT(NVARCHAR(20),SERVERPROPERTY('ProductVersion')), 2) AS INT) < 5026)
+IF SERVERPROPERTY('EngineEdition') <> 8 AND (@product_version < 13 OR (@product_version = 13 AND TRY_CAST(PARSENAME(CONVERT(NVARCHAR(20),SERVERPROPERTY('ProductVersion')), 2) AS INT) < 5026))
 BEGIN
-	SET @error_message_OUT = N'Not tested on versions older than SQL Server 2012. Comment out this check in AgentJobMultiThread_InitialValidation at your own risk to run on older versions.'; 
-	RETURN;
+    SET @error_message_OUT = N'Not tested on versions older than SQL Server 2016. Comment out this check in AgentJobMultiThread_InitialValidation at your own risk to run on older versions.';
+    RETURN;
 END;
 
 
--- need the ability to run agent jobs so limit support to standard, developer, and enterprise
-IF SERVERPROPERTY('EditionID') NOT IN (1804890536, 1872460670, 610778273, -2117995310, -1534726760)
+-- need the ability to run agent jobs so limit support to Managed Instances, standard, developer, and enterprise
+IF SERVERPROPERTY('EditionID') NOT IN (1804890536, 1872460670, 610778273, -2117995310, -1534726760, 1674378470)
 BEGIN
-	SET @error_message_OUT = N'Only supported on SQL Server Enterprise, Developer, and Standard editions.'; 
-	RETURN;
-END;
-
-
--- not able to test on other engines
-IF SERVERPROPERTY('EngineEdition') NOT IN (2, 3)
-BEGIN
-	SET @error_message_OUT = N'Only supported for on-premises versions of SQL Server.'; 
-	RETURN;
+    SET @error_message_OUT = N'Only supported on SQL Server Managed Instances, Enterprise, Developer, and Standard editions.';
+    RETURN;
 END;
 
 
